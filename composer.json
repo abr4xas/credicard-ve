@@ -1,0 +1,51 @@
+{
+    "name": "abr4xas/credicard-ve",
+    "description": "This is my package credit card",
+    "keywords": [
+        "abr4xas",
+        "creditcard-ve"
+    ],
+    "homepage": "https://github.com/abr4xas/credicard-ve",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Angel",
+            "email": "bullgram@gmail.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^8.1",
+        "guzzlehttp/guzzle": "^7.9.2"
+    },
+    "require-dev": {
+        "laravel/pint": "^1.17.2",
+        "mockery/mockery": "^1.6.12",
+        "pestphp/pest": "^2.35.1",
+        "spatie/ray": "^1.41.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "CrediCardVe\\CrediCardVe\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "CrediCardVe\\CrediCardVe\\Tests\\": "tests"
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/pest",
+        "test-coverage": "vendor/bin/pest --coverage",
+        "format": "vendor/bin/pint"
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true,
+            "phpstan/extension-installer": true
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
