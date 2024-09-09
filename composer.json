@@ -21,7 +21,7 @@
     "require-dev": {
         "laravel/pint": "^1.17.2",
         "mockery/mockery": "^1.6.12",
-        "pestphp/pest": "^2.35.1",
+        "pestphp/pest": "^3.0.1",
         "spatie/ray": "^1.41.2"
     },
     "autoload": {
