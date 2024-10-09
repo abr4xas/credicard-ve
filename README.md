@@ -1,4 +1,4 @@
-# This is my package creditcard-ve
+# creditcard-ve
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/abr4xas/credicard-ve.svg?style=flat-square)](https://packagist.org/packages/abr4xas/credicard-ve)
 [![Tests](https://img.shields.io/github/actions/workflow/status/abr4xas/credicard-ve/run-tests.yml?branch=master&label=tests&style=flat-square)](https://github.com/abr4xas/credicard-ve/actions/workflows/run-tests.yml)
@@ -16,15 +16,7 @@ composer require abr4xas/credicard-ve
 
 ## Usage
 
-```php
-$crediCard = new CrediCardVe(
-    'test-client-id',
-    'test-client-secret',
-    'https://api.example.com'
-);
-
-// todo
-```
+See [docs](docs.md)
 
 ## Testing
 
