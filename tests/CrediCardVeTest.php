@@ -216,9 +216,9 @@ it('can pay using different types of cards', function ($paymentDetails, $expecte
 })->with('payment cases');
 
 it('successfully encrypts a PIN with a valid public key', function () {
-	$pin = 1234;
+    $pin = 1234;
 
-	$publicKey = <<<EOD
+    $publicKey = <<<'EOD'
     -----BEGIN PUBLIC KEY-----
     MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA3f7n2wAObZAqnXi0XLyg
     UFxV21ExGUimDKTmtAIp3QLfqbywP0bY/lrHfBZsmmrjyXpy4Hrvok/ugmNZnVbV
@@ -230,37 +230,37 @@ it('successfully encrypts a PIN with a valid public key', function () {
     -----END PUBLIC KEY-----
     EOD;
 
-	$encryptedPin = $this->creditCardVe->encryptPin($pin, $publicKey);
+    $encryptedPin = $this->creditCardVe->encryptPin($pin, $publicKey);
 
-	expect($encryptedPin)->not->toBeFalse()
-		->and($encryptedPin)->toBeString();
+    expect($encryptedPin)->not->toBeFalse()
+        ->and($encryptedPin)->toBeString();
 });
 
 it('fails to encrypt with an invalid public key', function () {
-	$pin = 1234;
+    $pin = 1234;
 
-	$invalidPublicKey = 'clave-publica-invalida';
+    $invalidPublicKey = 'clave-publica-invalida';
 
-	$encryptedPin = $this->creditCardVe->encryptPin($pin, $invalidPublicKey);
+    $encryptedPin = $this->creditCardVe->encryptPin($pin, $invalidPublicKey);
 
-	expect($encryptedPin)->toBeFalse();
+    expect($encryptedPin)->toBeFalse();
 });
 
 it('correctly formats a valid public key', function () {
-	$rawKey = 'MIICIjANBgkqhkiG9w0...';
+    $rawKey = 'MIICIjANBgkqhkiG9w0...';
 
-	$formattedKey = $this->creditCardVe->formatPublicKey($rawKey);
+    $formattedKey = $this->creditCardVe->formatPublicKey($rawKey);
 
-	expect($formattedKey)->toStartWith('-----BEGIN PUBLIC KEY-----')
-		->and($formattedKey)->toEndWith('-----END PUBLIC KEY-----')
-		->and($formattedKey)->toContain("\n");
+    expect($formattedKey)->toStartWith('-----BEGIN PUBLIC KEY-----')
+        ->and($formattedKey)->toEndWith('-----END PUBLIC KEY-----')
+        ->and($formattedKey)->toContain("\n");
 });
 
 it('adds missing BEGIN and END tags to a public key', function () {
-	$rawKey = 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA3f7n2wAObZAqnXi0XLyg...';
+    $rawKey = 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA3f7n2wAObZAqnXi0XLyg...';
 
-	$formattedKey = $this->creditCardVe->formatPublicKey($rawKey);
+    $formattedKey = $this->creditCardVe->formatPublicKey($rawKey);
 
-	expect($formattedKey)->toStartWith('-----BEGIN PUBLIC KEY-----')
-		->and($formattedKey)->toEndWith('-----END PUBLIC KEY-----');
+    expect($formattedKey)->toStartWith('-----BEGIN PUBLIC KEY-----')
+        ->and($formattedKey)->toEndWith('-----END PUBLIC KEY-----');
 });
