@@ -13,9 +13,13 @@ class CrediCardVe
 
     private ?string $accessToken = null;
 
-    /**
-     * @throws CreditCardException
-     */
+	/**
+	 * @param  string  $clientId
+	 * @param  string  $clientSecret
+	 * @param  string  $baseUrl
+	 * @param  bool  $verifySsl
+	 * @throws CreditCardException
+	 */
     public function __construct(
         protected string $clientId,
         protected string $clientSecret,
@@ -40,11 +44,19 @@ class CrediCardVe
         ]);
     }
 
+	/**
+	 * @param  Client  $client
+	 * @return void
+	 */
     public function setClient(Client $client): void
     {
         $this->client = $client;
     }
 
+	/**
+	 * @param  int  $cardNumber
+	 * @return mixed
+	 */
     public function getCardBankInfo(int $cardNumber): mixed
     {
         return $this->makeRequest('/payment/card_info', [
@@ -57,6 +69,13 @@ class CrediCardVe
         ], 'GET');
     }
 
+	/**
+	 * @param  int  $cardNumber
+	 * @param  string  $cardType
+	 * @param  string  $currency
+	 * @param  float  $amount
+	 * @return mixed
+	 */
     public function getCardHolderCommission(
         int $cardNumber,
         string $cardType,
@@ -76,6 +95,10 @@ class CrediCardVe
         ], 'GET');
     }
 
+	/**
+	 * @param  array  $paymentData
+	 * @return mixed
+	 */
     public function payUsingCard(array $paymentData): mixed
     {
         return $this->makeRequest('/payment', [
@@ -90,6 +113,12 @@ class CrediCardVe
         ], 'POST');
     }
 
+	/**
+	 * @param  string  $bankCode
+	 * @param  string  $rif
+	 * @param  string  $phone
+	 * @return mixed
+	 */
     public function bankCardSendToken(string $bankCode, string $rif, string $phone): mixed
     {
         return $this->makeRequest('/payment/bank_card/send_token', [
@@ -106,6 +135,10 @@ class CrediCardVe
         ], 'POST');
     }
 
+	/**
+	 * @param  array  $creditCardData
+	 * @return mixed
+	 */
     public function sendBankCardValidationToken(array $creditCardData): mixed
     {
         return $this->makeRequest('/payment/send_token_with_card', [
@@ -118,6 +151,10 @@ class CrediCardVe
         ], 'POST');
     }
 
+	/**
+	 * @param  array  $params
+	 * @return mixed
+	 */
     public function transactionReports(array $params): mixed
     {
         return $this->makeRequest('/payment/transaction_report', [
@@ -128,6 +165,55 @@ class CrediCardVe
         ], 'GET');
     }
 
+	/**
+	 * @param  int  $pin
+	 * @param  string  $publicKey
+	 * @return bool|string
+	 */
+	public function encryptPin(int $pin, string $publicKey): bool|string
+	{
+		//	just to be sure we have the right format
+		$formatedPublicKey = $this->formatPublicKey($publicKey);
+
+		$publicKeyResource = openssl_pkey_get_public($formatedPublicKey);
+
+		if ($publicKeyResource === false) {
+			return false;
+		}
+
+		$encryptedPin = null;
+
+		if (openssl_public_encrypt($pin, $encryptedPin, $publicKeyResource)) {
+			return base64_encode($encryptedPin);
+		}
+
+		return false;
+	}
+
+	/**
+	 * @param  string  $key
+	 * @return string
+	 */
+	public function formatPublicKey(string $key): string {
+		$key = trim($key);
+
+		if (!str_contains($key, '-----BEGIN PUBLIC KEY-----')) {
+			$key = "-----BEGIN PUBLIC KEY-----\n" . $key;
+		}
+
+		if (!str_contains($key, '-----END PUBLIC KEY-----')) {
+			$key .= "\n-----END PUBLIC KEY-----";
+		}
+
+		$key = str_replace(['-----BEGIN PUBLIC KEY-----', '-----END PUBLIC KEY-----'], '', $key);
+		$key = preg_replace('/\s+/', '', $key);
+		$formattedKey = chunk_split($key, 64, "\n");
+		return "-----BEGIN PUBLIC KEY-----\n" . $formattedKey . "-----END PUBLIC KEY-----";
+	}
+
+	/**
+	 * @return string
+	 */
     private function getAccessToken(): string
     {
         if ($this->accessToken === null) {
@@ -138,6 +224,9 @@ class CrediCardVe
         return $this->accessToken;
     }
 
+	/**
+	 * @return mixed
+	 */
     private function requestToken(): mixed
     {
         return $this->makeRequest('/oauth/authorize', [
@@ -152,6 +241,12 @@ class CrediCardVe
         ], 'POST');
     }
 
+	/**
+	 * @param  string  $url
+	 * @param  array  $args
+	 * @param  string  $method
+	 * @return mixed
+	 */
     private function makeRequest(string $url, array $args, string $method): mixed
     {
         try {
