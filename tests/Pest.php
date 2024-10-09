@@ -1,6 +1,6 @@
 <?php
 
-dataset('paymentCases', [
+dataset('payment cases', [
     'debit card' => [
         [
             'currency' => 'VED',

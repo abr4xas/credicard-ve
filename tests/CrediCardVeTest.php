@@ -5,7 +5,9 @@ use CrediCardVe\CrediCardVe\Exceptions\CreditCardException;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
 
-beforeEach(function () {
+beforeEach(/**
+ * @throws CreditCardException
+ */ function () {
     $this->clientId = 'test-client-id';
     $this->clientSecret = 'test-client-secret';
     $this->baseUrl = 'https://api.example.com';
@@ -211,4 +213,54 @@ it('can pay using different types of cards', function ($paymentDetails, $expecte
             ->and($result['message'])->toBe('CREDICARD_RESPONSE_UNSUCCESSFUL')
             ->and($result['cause'])->toBeArray();
     }
-})->with('paymentCases');
+})->with('payment cases');
+
+it('successfully encrypts a PIN with a valid public key', function () {
+    $pin = 1234;
+
+    $publicKey = <<<'EOD'
+    -----BEGIN PUBLIC KEY-----
+    MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA3f7n2wAObZAqnXi0XLyg
+    UFxV21ExGUimDKTmtAIp3QLfqbywP0bY/lrHfBZsmmrjyXpy4Hrvok/ugmNZnVbV
+    TBDG5YvUQmMESo4n8QJR0qnHmY4PfiJgN32/VXX1JeTNC3HESJTQRlmBHl05uh/b
+    jGy7Pi1Gd0A9Ti2ANvZvGo667vEsRlYjbjK1/dBGS6pzgGsyRG8CJJZrApguLXob
+    N25zzvmuY1kXPSG/9Nv7HpmgxhdkLhbmTBKA0U3pgiYXkcmv6TgKAIVr1ixeZu/d
+    0fhJQSOYRg+ziJW9wz1/XoDTLIyCO/egXuhKci0YSPM8tArIiSwvODCCl+Cc0j/I
+    XwIDAQAB
+    -----END PUBLIC KEY-----
+    EOD;
+
+    $encryptedPin = $this->creditCardVe->encryptPin($pin, $publicKey);
+
+    expect($encryptedPin)->not->toBeFalse()
+        ->and($encryptedPin)->toBeString();
+});
+
+it('fails to encrypt with an invalid public key', function () {
+    $pin = 1234;
+
+    $invalidPublicKey = 'clave-publica-invalida';
+
+    $encryptedPin = $this->creditCardVe->encryptPin($pin, $invalidPublicKey);
+
+    expect($encryptedPin)->toBeFalse();
+});
+
+it('correctly formats a valid public key', function () {
+    $rawKey = 'MIICIjANBgkqhkiG9w0...';
+
+    $formattedKey = $this->creditCardVe->formatPublicKey($rawKey);
+
+    expect($formattedKey)->toStartWith('-----BEGIN PUBLIC KEY-----')
+        ->and($formattedKey)->toEndWith('-----END PUBLIC KEY-----')
+        ->and($formattedKey)->toContain("\n");
+});
+
+it('adds missing BEGIN and END tags to a public key', function () {
+    $rawKey = 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA3f7n2wAObZAqnXi0XLyg...';
+
+    $formattedKey = $this->creditCardVe->formatPublicKey($rawKey);
+
+    expect($formattedKey)->toStartWith('-----BEGIN PUBLIC KEY-----')
+        ->and($formattedKey)->toEndWith('-----END PUBLIC KEY-----');
+});

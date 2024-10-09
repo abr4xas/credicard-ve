@@ -1,6 +1,6 @@
 {
     "name": "abr4xas/credicard-ve",
-    "description": "This is my package credit card",
+    "description": "Es una interfaz para interactuar con la API de CrediCard. Proporciona métodos para obtener información sobre tarjetas bancarias y realizar pagos utilizando tarjetas de crédito o débito. Esta clase es útil para aplicaciones que necesitan procesar pagos de manera segura y eficiente utilizando la API de CrediCard.",
     "keywords": [
         "abr4xas",
         "creditcard-ve"
@@ -16,12 +16,13 @@
     ],
     "require": {
         "php": "^8.2",
-        "guzzlehttp/guzzle": "^7.9.2"
-    },
+        "guzzlehttp/guzzle": "^7.9.2",
+		"ext-openssl": "*"
+	},
     "require-dev": {
-        "laravel/pint": "^1.17.3",
+        "laravel/pint": "^1.18.1",
         "mockery/mockery": "^1.6.12",
-        "pestphp/pest": "^3.0.4",
+        "pestphp/pest": "^3.3.0",
         "spatie/ray": "^1.41.2"
     },
     "autoload": {

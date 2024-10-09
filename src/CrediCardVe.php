@@ -128,6 +128,45 @@ class CrediCardVe
         ], 'GET');
     }
 
+    public function encryptPin(int $pin, string $publicKey): bool | string
+    {
+        //	just to be sure we have the right format
+        $formatedPublicKey = $this->formatPublicKey($publicKey);
+
+        $publicKeyResource = openssl_pkey_get_public($formatedPublicKey);
+
+        if ($publicKeyResource === false) {
+            return false;
+        }
+
+        $encryptedPin = null;
+
+        if (openssl_public_encrypt($pin, $encryptedPin, $publicKeyResource)) {
+            return base64_encode($encryptedPin);
+        }
+
+        return false;
+    }
+
+    public function formatPublicKey(string $key): string
+    {
+        $key = trim($key);
+
+        if (! str_contains($key, '-----BEGIN PUBLIC KEY-----')) {
+            $key = "-----BEGIN PUBLIC KEY-----\n" . $key;
+        }
+
+        if (! str_contains($key, '-----END PUBLIC KEY-----')) {
+            $key .= "\n-----END PUBLIC KEY-----";
+        }
+
+        $key = str_replace(['-----BEGIN PUBLIC KEY-----', '-----END PUBLIC KEY-----'], '', $key);
+        $key = preg_replace('/\s+/', '', $key);
+        $formattedKey = chunk_split($key, 64, "\n");
+
+        return "-----BEGIN PUBLIC KEY-----\n" . $formattedKey . '-----END PUBLIC KEY-----';
+    }
+
     private function getAccessToken(): string
     {
         if ($this->accessToken === null) {
