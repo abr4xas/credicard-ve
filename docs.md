@@ -41,16 +41,35 @@ print_r($response);
 
 ```json
 {
-    "bank_info": {
-        "country": "VE",
-        "code": "0172",
-        "name": "BANCAMIGA, BANCO MICROFINANCIERO C.A.",
-        "thumbnail": "images/thumbnails/issuingBank/bancamiga.png"
-    },
-    "financial_card_emitter": {
-        "name": "MAESTRO",
-        "thumbnail": "images/issuingcard/maestro.png"
-    }
+	"bank_info": {
+		"country": "VE",
+		"code": "0172",
+		"name": "BANCAMIGA, BANCO MICROFINANCIERO C.A.",
+		"acronym": "BANCAMIGA",
+		"thumbnail": "images/thumbnails/issuingBank/bancamiga.png",
+		"no_bin_found_card_payment_allowed": true,
+		"tdd_pin_required": true,
+		"card_validation_config": {
+			"TDD": "NONE"
+		},
+		"bank_card_validation": {
+			"TDD": false
+		}
+	},
+	"financial_card_emitter": {
+		"name": "MAESTRO",
+		"thumbnail": "images/issuingcard/maestro.png"
+	},
+	"card_status": "VALIDATED",
+	"otp_ccr_config": {
+		"enabled": true,
+		"code_min_integer": 15,
+		"code_max_integer": 40,
+		"code_expiration_time": 24,
+		"code_expiration_time_unit": "HOURS",
+		"validation_expires_at_time": 180,
+		"validation_expires_at_time_unit": "DAYS"
+	}
 }
 ```
 
@@ -88,7 +107,39 @@ print_r($response);
 ### 3. `payUsingCard(array $paymentData): mixed`
 
 #### Descripción:
-Procesa un pago utilizando los datos de una tarjeta de débito o crédito. El PIN se encripta utilizando el método `encryptPin`.
+Procesa un pago utilizando los datos de una tarjeta de débito o crédito. 
+
+#### Ejemplo de uso:
+
+```php
+
+$paymentData = [
+    'currency' => 'VED',
+    'amount' => 1.0,
+    'reason' => 'PRUEBA',
+    'country' => 'VE',
+    'payer_name' => 'DHARRYLX',
+    'debit_card' => [
+        'holder_name' => 'DHARRYLX',
+        'holder_id' => 'V016673906',
+        'holder_id_doc' => 'RIF',
+        'card_number' => '5859480000000146871',
+        'cvc' => '941',
+        'expiration_month' => 6,
+        'expiration_year' => 24,
+        'card_type' => 'DEBIT',
+        'account_type' => 'CORRIENTE',
+    ]
+];
+
+$response = $crediCardVe->payUsingCard($paymentData);
+
+print_r($response);
+```
+
+### 3.1 Cifrar pin.
+
+El PIN se encripta utilizando el método `encryptPin`. Solo se debe implementar cuando la consulta a `getCardBankInfo` retorne la key: `tdd_pin_required` como `true`.
 
 #### Ejemplo de uso:
 
